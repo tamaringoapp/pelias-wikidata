@@ -40,24 +40,38 @@ Images from wikidata are usually under a [Creative Commons](http://creativecommo
 
 # Usage
 
-## Configure
+## Configuration
+
+`imports.wikidata.datapath`
+
+This is the directory where the wikidata importer will look for files to import. It will also download files to this location.
+
+
+`imports.wikidata.download.sourceURL`
+
+URL of the source file (download phase). It has to be a gzip compressed json.
+
+`imports.wikidata.import.filename`
+
+The name of the gzipped json file to use in the extract phase.
+
+`imports.wikidata.import.langs`
+
+If configured, the languages to keep in the etract phase (for labels). By default, all will be kept.
+
+Example:
 
 ```json
 {
-  // under imports
   "imports": {
     "wikidata": {
       "datapath": "/path/to/wikidata",
       "download": {
-        // URL of the source file (downlaod phase)
-        // It has to be a gz compressed json
         "sourceURL": "http://dumps.wikimedia.your.org/wikidatawiki/entities/latest-all.json.gz"
       },
       "import": {
-        // name of the file to use in the extract phase
         "filename": "latest-all.json.gz"
       },
-      // languages to keep in the etract phase (for labels)
       "langs": ["fr", "en", "es"]
     }
   }
@@ -66,17 +80,18 @@ Images from wikidata are usually under a [Creative Commons](http://creativecommo
 
 ## Extract metadata
 
-The easiest and recommended way of using the importer is through Docker. The image `tamaringo/pelias-wikidata` can be found on [dockerhub](https://hub.docker.com/repository/docker/tamaringo/pelias-wikidata)
+The easiest and recommended way of using the importer is through Docker. The image `tamaringo/pelias-wikidata` can be found on [dockerhub](https://hub.docker.com/r/tamaringo/pelias-wikidata)
 
 
 ```sh
+docker pull tamaringo/pelias-wikidata
 # download wikidata json dump
 docker run --rm -it tamaringo/pelias-wikidata bin/download
 # extract the fields into the sqlite3 database
 docker run --rm -it tamaringo/pelias-wikidata bin/extract
 ```
 
-It takes about 8-9 hours to do a full extract.
+It takes about 9 hours to do a full extract.
 
 ## Import into pelias
 

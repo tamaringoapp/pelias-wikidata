@@ -56,7 +56,7 @@ const getTranslations = (record, field) => {
   const translations = _.reduce(
     record[field],
     (acc, value, lang) => {
-      if (allowed_langs.includes(lang)) {
+      if (!allowed_langs || allowed_langs.includes(lang)) {
         let val;
         if (Array.isArray(value)) {
           val = value.map(v => v.value);
