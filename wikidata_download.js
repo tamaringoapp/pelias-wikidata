@@ -1,7 +1,6 @@
 'use strict';
 
 const _ = require('lodash');
-const async = require('async');
 const child_process = require('child_process');
 const fs = require('fs');
 const config = require('pelias-config').generate();

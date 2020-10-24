@@ -26,6 +26,11 @@ Currently, this project extracts 2 fields:
 
 Osm is usually not very complete or well updated when it comes to place names. Translated names of known places will be extracted from wikidata and will complete those imported from osm.
 
+- Translated aliases
+
+Sometimes, places ahve several names (or aliases). For example, the [eiffel tower](https://www.wikidata.org/wiki/Q243) i ssometimes called _La dame de fer_ in French. This information is often not present in Openstreetmap. However, here again wikidata tends to be more complete. 
+
+
 - Images
 
 It is often nice to be able to show an image of places to the user when they use the [autocomplete](https://github.com/pelias/documentation/blob/master/autocomplete.md). Images can be extracted from wikidata (when available). (Only the first image is extracted).
@@ -71,8 +76,34 @@ docker run --rm -it tamaringo/pelias-wikidata bin/download
 docker run --rm -it tamaringo/pelias-wikidata bin/extract
 ```
 
-## import into pelias
+It takes about 8-9 hours to do a full extract.
+
+## Import into pelias
 
 After generating a sqlite3 file containing the information, you'll need to extend pelias in order to use it with your osm importer.
 
-_To be documented_
+You can find an [example](example/extend/osm.js) of how to use the data in the example directory.
+
+You will need to inject the stream into pelias' existing [importPipeline.js](https://github.com/pelias/openstreetmap/blob/master/stream/importPipeline.js). (You can do it right before 'streams.dbMapper()').
+
+Example:
+
+```js
+stream.extend = require('path/to/extend_osm');
+
+streams.import = function(){
+  streams.pbfParser()
+    .pipe( streams.docConstructor() )
+    .pipe( streams.tagMapper() )
+    .pipe( streams.addressExtractor() )
+    .pipe( streams.blacklistStream() )
+    .pipe( streams.categoryMapper( categoryDefaults ) )
+    .pipe( streams.addendumMapper() )
+    .pipe( streams.popularityMapper() )
+    .pipe( streams.adminLookup() )
+    .pipe( stream.extend() )
+    .pipe( streams.dbMapper() )
+    .pipe( streams.extend() )
+    .pipe( streams.elasticsearch({name: 'openstreetmap'}) );
+};
+```

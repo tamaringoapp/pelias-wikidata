@@ -52,27 +52,33 @@ const getAddendum = record => {
   }
 };
 
-const getLabels = record => {
-  const labels = _.reduce(
-    record.labels,
-    (acc, value) => {
-      if (allowed_langs.includes(value.language)) {
-        acc[value.language] = value.value;
+const getTranslations = (record, field) => {
+  const translations = _.reduce(
+    record[field],
+    (acc, value, lang) => {
+      if (allowed_langs.includes(lang)) {
+        let val;
+        if (Array.isArray(value)) {
+          val = value.map(v => v.value);
+        } else {
+          val = value.value;
+        }
+        acc[lang] = val;
       }
-
       return acc;
     },
     {},
   );
-  if (!_.isEmpty(labels)) {
-    return labels;
+  if (!_.isEmpty(translations)) {
+    return translations;
   }
 };
 
 const getMetadata = record => {
   const metadata = _.pickBy(
     {
-      labels: getLabels(record),
+      labels: getTranslations(record, 'labels'),
+      aliases: getTranslations(record, 'aliases'),
       addendum: getAddendum(record),
     },
     _.negate(_.isEmpty),
